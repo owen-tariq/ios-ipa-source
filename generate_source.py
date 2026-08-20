@@ -102,18 +102,26 @@ def get_apex_versions():
 source = {
     "name": "My Custom iOS Source",
     "identifier": "com.owentariq.feathersource",
+    "iconURL": "https://raw.githubusercontent.com/luqmanfadlli/NuvioMobile-iOS/cmp-rewrite/iosApp/iosApp/Assets.xcassets/AppIcon.appiconset/app-icon-1024.png",
+    "news": [],
     "apps": [
         {
             "name": "Nuvio",
             "bundleIdentifier": "com.luqmanfadlli.nuvio",
             "developerName": "luqmanfadlli",
+            "subtitle": "Watch your library, anywhere",
+            "localizedDescription": "Nuvio Mobile for iOS and iPadOS",
+            "iconURL": "https://raw.githubusercontent.com/luqmanfadlli/NuvioMobile-iOS/cmp-rewrite/iosApp/iosApp/Assets.xcassets/AppIcon.appiconset/app-icon-1024.png",
             "version": "0.0.0",
             "versions": get_nuvio_versions()
         },
         {
             "name": "APEX",
-            "bundleIdentifier": "com.lowiqentity.apex",
+            "bundleIdentifier": "com.google.ios.youtube",
             "developerName": "lowiqentity",
+            "subtitle": "YouTube for iOS",
+            "localizedDescription": "APEX is a build of YouTube with custom enhancements.",
+            "iconURL": "https://raw.githubusercontent.com/lowiqentity/APEX/main/Assets/repo_icon.png",
             "version": "0.0.0",
             "versions": get_apex_versions()
         }
