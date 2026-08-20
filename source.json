@@ -1,0 +1,20 @@
+{
+  "name": "My Custom iOS Source",
+  "identifier": "com.owentariq.feathersource",
+  "apps": [
+    {
+      "name": "Nuvio",
+      "bundleIdentifier": "com.luqmanfadlli.nuvio",
+      "developerName": "luqmanfadlli",
+      "version": "0.0.0",
+      "versions": []
+    },
+    {
+      "name": "APEX",
+      "bundleIdentifier": "com.lowiqentity.apex",
+      "developerName": "lowiqentity",
+      "version": "0.0.0",
+      "versions": []
+    }
+  ]
+}
