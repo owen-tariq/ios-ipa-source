@@ -1,11 +1,16 @@
 {
   "name": "My Custom iOS Source",
   "identifier": "com.owentariq.feathersource",
+  "iconURL": "https://raw.githubusercontent.com/luqmanfadlli/NuvioMobile-iOS/cmp-rewrite/iosApp/iosApp/Assets.xcassets/AppIcon.appiconset/app-icon-1024.png",
+  "news": [],
   "apps": [
     {
       "name": "Nuvio",
       "bundleIdentifier": "com.luqmanfadlli.nuvio",
       "developerName": "luqmanfadlli",
+      "subtitle": "Watch your library, anywhere",
+      "localizedDescription": "Nuvio Mobile for iOS and iPadOS",
+      "iconURL": "https://raw.githubusercontent.com/luqmanfadlli/NuvioMobile-iOS/cmp-rewrite/iosApp/iosApp/Assets.xcassets/AppIcon.appiconset/app-icon-1024.png",
       "version": "0.4.6-Enhanced",
       "versions": [
         {
@@ -425,36 +430,39 @@
     },
     {
       "name": "APEX",
-      "bundleIdentifier": "com.lowiqentity.apex",
+      "bundleIdentifier": "com.google.ios.youtube",
       "developerName": "lowiqentity",
+      "subtitle": "YouTube for iOS",
+      "localizedDescription": "APEX is a build of YouTube with custom enhancements.",
+      "iconURL": "https://raw.githubusercontent.com/lowiqentity/APEX/main/Assets/repo_icon.png",
       "version": "0.1.5",
       "versions": [
         {
           "version": "0.1.5",
           "date": "2026-08-12T06:18:10Z",
           "size": 100000000,
-          "downloadURL": "https://files.catbox.moe/hkk4xy.ipa",
+          "downloadURL": "https://github.com/owen-tariq/ios-ipa-source/releases/download/APEX-0.1.5/APEX-0.1.5.ipa",
           "localizedDescription": "Release: https://files.catbox.moe/hkk4xy.ipa\r\n\r\nFixed:\r\n\r\n - All recent bugs reported."
         },
         {
           "version": "0.1.3",
           "date": "2026-08-09T14:20:59Z",
           "size": 100000000,
-          "downloadURL": "https://files.catbox.moe/m7bzg9.ipa",
+          "downloadURL": "https://github.com/owen-tariq/ios-ipa-source/releases/download/APEX-0.1.3/APEX-0.1.3.ipa",
           "localizedDescription": "Release: https://files.catbox.moe/m7bzg9.ipa\r\n\r\nAdded:\r\n  - Complete localization of current APEX menus\r\n  - True Black Video Bars: Player Overlay \u2192 Overlay Appearance\r\n  - Fake Brightness: App & Appearance \u2192 Viewing Comfort\r\n  - Includes dimming level, scheduling, start/end times, and overnight schedules\r\n  - Bump to YouTube 21.31.3\r\n  \r\nFixed:\r\n  - Stretched icon for Video Quality\r\n  - Other minor fixes"
         },
         {
           "version": "0.1.1",
           "date": "2026-08-05T09:16:49Z",
           "size": 100000000,
-          "downloadURL": "https://files.catbox.moe/q7cvav.ipa",
+          "downloadURL": "https://github.com/owen-tariq/ios-ipa-source/releases/download/APEX-0.1.1/APEX-0.1.1.ipa",
           "localizedDescription": "Release: https://files.catbox.moe/q7cvav.ipa\r\n\r\nFixed all bugs under issues."
         },
         {
           "version": "0.1.0",
           "date": "2026-08-03T06:19:49Z",
           "size": 100000000,
-          "downloadURL": "https://files.catbox.moe/5kz9oe.ipa",
+          "downloadURL": "https://github.com/owen-tariq/ios-ipa-source/releases/download/APEX-0.1.0/APEX-0.1.0.ipa",
           "localizedDescription": "Release: https://files.catbox.moe/5kz9oe.ipa"
         }
       ]
