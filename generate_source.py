@@ -1,12 +1,59 @@
 import urllib.request
 import json
 import re
+import os
+import subprocess
 from datetime import datetime
 
 def fetch_json(url):
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     with urllib.request.urlopen(req) as response:
         return json.loads(response.read().decode())
+
+def download_file(url, filename):
+    print(f"Downloading {url} to {filename}...")
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    with urllib.request.urlopen(req) as response, open(filename, 'wb') as out_file:
+        out_file.write(response.read())
+
+def get_or_create_mirror_release(tag_name, original_url, app_name):
+    # Release tag like "APEX-0.1.5"
+    mirror_tag = f"{app_name}-{tag_name}"
+    
+    # Check if this release already exists in our repo
+    try:
+        # gh release view APEX-0.1.5 --json assets
+        result = subprocess.run(["gh", "release", "view", mirror_tag, "--json", "assets"], capture_output=True, text=True)
+        if result.returncode == 0:
+            release_data = json.loads(result.stdout)
+            if release_data.get("assets"):
+                print(f"Mirror for {mirror_tag} already exists.")
+                return release_data["assets"][0]["url"]
+    except Exception as e:
+        print(f"Error checking release {mirror_tag}: {e}")
+
+    # If it doesn't exist or doesn't have assets, we need to download and upload it
+    print(f"Creating mirror release for {mirror_tag}...")
+    filename = f"{mirror_tag}.ipa"
+    try:
+        download_file(original_url, filename)
+        
+        # Create release and upload asset
+        subprocess.run(["gh", "release", "create", mirror_tag, filename, "--title", f"{app_name} {tag_name} Mirror", "--notes", f"Mirrored from {original_url}"], check=True)
+        
+        # Get the new URL
+        result = subprocess.run(["gh", "release", "view", mirror_tag, "--json", "assets"], capture_output=True, text=True, check=True)
+        release_data = json.loads(result.stdout)
+        
+        # Clean up local file
+        os.remove(filename)
+        
+        return release_data["assets"][0]["url"]
+    except Exception as e:
+        print(f"Failed to mirror {mirror_tag}: {e}")
+        if os.path.exists(filename):
+            os.remove(filename)
+        return original_url # Fallback to original URL if mirroring fails
 
 def get_nuvio_versions():
     try:
@@ -35,12 +82,16 @@ def get_apex_versions():
             body = rel.get('body', '')
             match = re.search(r'(https?://[^\s]+\.ipa)', body)
             if match:
-                url = match.group(1)
+                original_url = match.group(1)
+                
+                # Mirror the IPA since Catbox links can be unreliable
+                mirrored_url = get_or_create_mirror_release(rel['tag_name'], original_url, "APEX")
+                
                 versions.append({
                     "version": rel['tag_name'],
                     "date": rel['published_at'],
                     "size": 100000000,
-                    "downloadURL": url,
+                    "downloadURL": mirrored_url,
                     "localizedDescription": body
                 })
         return versions
