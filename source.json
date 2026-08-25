@@ -442,8 +442,15 @@
       "subtitle": "YouTube for iOS",
       "localizedDescription": "APEX is a build of YouTube with custom enhancements.",
       "iconURL": "https://raw.githubusercontent.com/lowiqentity/APEX/main/Assets/repo_icon.png",
-      "version": "0.1.5",
+      "version": "0.1.8",
       "versions": [
+        {
+          "version": "0.1.8",
+          "date": "2026-08-25T08:50:42Z",
+          "size": 100000000,
+          "downloadURL": "https://github.com/owen-tariq/ios-ipa-source/releases/download/APEX-0.1.8/APEX-0.1.8.ipa",
+          "localizedDescription": "\r\nRelease: https://files.catbox.moe/fxsx2i.ipa\r\n\r\nFixed:\r\nLots of shit."
+        },
         {
           "version": "0.1.5",
           "date": "2026-08-12T06:18:10Z",
