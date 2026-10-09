@@ -11,13 +11,13 @@
       "subtitle": "Watch your library, anywhere",
       "localizedDescription": "Nuvio Mobile for iOS and iPadOS",
       "iconURL": "https://raw.githubusercontent.com/luqmanfadlli/NuvioMobile-iOS/cmp-rewrite/iosApp/iosApp/Assets.xcassets/AppIcon.appiconset/app-icon-1024.png",
-      "version": "0.5.8-beta-Enhanced",
+      "version": "0.5.8-beta-Full",
       "versions": [
         {
-          "version": "0.5.8-beta-Enhanced",
+          "version": "0.5.8-beta-Full",
           "date": "2026-10-09T02:01:29Z",
-          "size": 70482935,
-          "downloadURL": "https://github.com/luqmanfadlli/NuvioMobile-Enhanced/releases/download/0.5.8-beta/Nuvio-0.5.8-Enhanced.ipa",
+          "size": 70490675,
+          "downloadURL": "https://github.com/luqmanfadlli/NuvioMobile-Enhanced/releases/download/0.5.8-beta/nuvio-0.5.8-enhanced.ipa",
           "localizedDescription": "- fix(player): hide upstream's Stream Info action in the new layout @luqmanfadlli \r\n- fix(player): keep controls visible while a finger rests on the seek bar @luqmanfadlli\r\n- fix(omdb): only call OMDb for episode ratings on the details page @luqmanfadlli\r\n- feat(player): pick playback speed instead of cycling @luqmanfadlli\r\n- fix(player): release the seek-preview connection when a scrub ends @luqmanfadlli\r\n- feat(player): read chapters from mpv on iOS and Android libmpv @luqmanfadlli\r\n- fix(player): restore engine switching and media info on Android @luqmanfadlli\r\n- fix(player): grab seek-bar thumbnails from extension-less HLS streams @luqmanfadlli\r\n- fix(player): send stream headers when grabbing seek-bar thumbnails @luqmanfadlli\r\n- feat(player): 23 commits to add chapter segments if the source has it @chrisk325\r\n- fix(plugins,addons): guard activeRefreshJobs against concurrent modification @luqmanfadlli\r\n- feat(player): show thumbnail previews while dragging the seek bar @luqmanfadlli\r\n- i18n: Add Croatian (hr) translation (#2169) @Anarchydr\r\n- feat(mdblist): sort library lists by release date (#2196) @kernexshadow\r\n- Reset next episode preload flag on episode transition (#2193) @skoruppa\r\n- fix(UI): fix hero content shifting on horizontal and tablet layouts (#2190) @ThEgIGN\r\n- feat(servers): add experimental Jellyfin and Emby support (#2081) @tapframe\r\n- fix(streams): play streams that only have a ytId (#2115) @deejay189393"
         },
         {
