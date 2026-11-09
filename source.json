@@ -11,8 +11,15 @@
       "subtitle": "Watch your library, anywhere",
       "localizedDescription": "Nuvio Mobile for iOS and iPadOS",
       "iconURL": "https://raw.githubusercontent.com/luqmanfadlli/NuvioMobile-iOS/cmp-rewrite/iosApp/iosApp/Assets.xcassets/AppIcon.appiconset/app-icon-1024.png",
-      "version": "0.6.9-beta-Full",
+      "version": "0.6.10-beta-Full",
       "versions": [
+        {
+          "version": "0.6.10-beta-Full",
+          "date": "2026-11-09T07:10:24Z",
+          "size": 75374093,
+          "downloadURL": "https://github.com/luqmanfadlli/NuvioMobile-Enhanced/releases/download/0.6.10-beta/nuvio-0.6.10-enhanced-release.ipa",
+          "localizedDescription": "- perf(ios): memory optimization long sessions and 4K HDR/DV playback @luqmanfadlli\r\n- feat(player): add Anime4K 2x upscaler and line sharpener for ExoPlayer and mpv (#337) @chrisk325\r\n- fix(ios): detach the mpv metal layer before destroying mpv (#336) @luqmanfadlli\r\n- fix(player): start playback service as a normal service first (NUVIO-MOBILE-D9 NUVIO-MOBILE-9E NUVIO-MOBILE-9M NUVIO-MOBILE-PC) @tapframe\r\n- fix(player): cap buffer start times at the min buffer (NUVIO-MOBILE-1VH) @tapframe\r\n- fix(player): guard caption setting reads (NUVIO-MOBILE-25M) @tapframe\r\n- fix(network): treat SSL setup errors as failed requests (NUVIO-MOBILE-254 NUVIO-MOBILE-3N) @tapframe\r\n- fix(watched): copy unsynced keys before saving (NUVIO-MOBILE-260) @tapframe\r\n- i18n: add French translation for ratings strings (#2562) @SK-Gits\r\n- i18n(el): sync the Greek locale with 0.6.9 (playback audio, downmix, ratings) (#2561) @nosvasedis\r\n- i18n(he): translate party strings into Hebrew (#2557) @haveAnIssue\r\n- i18n(he): translate servers strings into Hebrew (#2556) @haveAnIssue\r\n- i18n(he): translate pip strings into Hebrew (#2555) @haveAnIssue\r\n- i18n(he): translate autosync strings into Hebrew (#2553) @haveAnIssue\r\n- i18n(he): translate mdblist strings into Hebrew (#2552) @haveAnIssue\r\n- i18n(he): translate ratings strings into Hebrew (#2551) @haveAnIssue\r\n- Update Japanese translation (#2559) @Joe00011\r\n- i18n(vi): translate ratings strings into Vietnamese (#2550) @blueocean2308\r\n- fix(player): reset addon subtitles only when the source changes @tapframe\r\n- feat(autosync): shared engine, enable on iOS (#2535) @skoruppa\r\n- fix(mdblist): remap anime episodes between addon and TMDB numbering (TV parity) (#2516) @kernexshadow"
+        },
         {
           "version": "0.6.9-beta-Full",
           "date": "2026-11-06T23:21:17Z",
@@ -215,13 +222,6 @@
           "size": 66030339,
           "downloadURL": "https://github.com/luqmanfadlli/NuvioMobile-Enhanced/releases/download/0.4.17/Nuvio-v0.4.17-Enhanced.ipa",
           "localizedDescription": "- fix(plugins): restore iOS runtime compilation @tapframe\r\n- fix(player): disable binge group reuse by default @tapframe\r\n- perf(plugins): pause search during playback and match TV runtime (#1917) @halibiram\r\n- fix(plugins): align runtime APIs with upstream execution model @luqmanfadlli\r\n- fix(sync): prevent automatic pulls from restoring deleted data @tapframe"
-        },
-        {
-          "version": "0.4.16-Enhanced",
-          "date": "2026-09-11T12:21:04Z",
-          "size": 66025212,
-          "downloadURL": "https://github.com/luqmanfadlli/NuvioMobile-Enhanced/releases/download/0.4.16/Nuvio-v0.4.16-Enhanced.ipa",
-          "localizedDescription": "- fix(home): settle hero carousel when returning @tapframe\r\n- fix(settings): require Trakt progress for continue watching window @tapframe\r\n- perf(ui): replace compottie spinner with native drawing @tapframe\r\n- feat(navigation): refine tablet bar and transition defaults @tapframe\r\n- feat(navigation): add reactive bottom bar glow @tapframe\r\n- feat(navigation): add shared blur transition @tapframe\r\n- feat(posters): lift original cards in zoom overlay @tapframe\r\n- feat(navigation): update bottom tab animation @tapframe\r\n- perf(android): add root navigation baseline profile @tapframe\r\n- fix(settings): defer search indexing until needed @tapframe\r\n- Merged English and Dutch strings.xml and translated all remaining English text into Dutch. (#1911) @scheperr\r\n- i18n(el): complete and tidy up Greek translations (#1910) @nosvasedis\r\n- fix(ci): increase iOS release timeout @tapframe\r\n- i18n(vi): full Vietnamese localization refresh for Mobile (#1883) @blueocean2308\r\n- fix(theme): apply saved custom colors @luqmanfadlli\r\n- fix(ui): fix back button position @luqmanfadlli\r\n- feat(library): pin title and filter row while scrolling @albertovinaroz\r\n- fix(ui): remove duplicate poster card clickable modifier @luqmanfadlli"
         }
       ]
     },
