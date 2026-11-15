@@ -11,8 +11,15 @@
       "subtitle": "Watch your library, anywhere",
       "localizedDescription": "Nuvio Mobile for iOS and iPadOS",
       "iconURL": "https://raw.githubusercontent.com/luqmanfadlli/NuvioMobile-iOS/cmp-rewrite/iosApp/iosApp/Assets.xcassets/AppIcon.appiconset/app-icon-1024.png",
-      "version": "0.6.12-beta-Full",
+      "version": "0.6.13-beta-Full",
       "versions": [
+        {
+          "version": "0.6.13-beta-Full",
+          "date": "2026-11-15T02:58:11Z",
+          "size": 75644478,
+          "downloadURL": "https://github.com/luqmanfadlli/NuvioMobile-Enhanced/releases/download/0.6.13-beta/nuvio-0.6.13-enhanced-release.ipa",
+          "localizedDescription": "- fix(app): log the mapped network condition after the upstream merge @luqmanfadlli \r\n- fix(details): apply the Simkl More Like This source @luqmanfadlli\r\n- feat(grid): show 6 posters per row in landscape, 7 on tablets @luqmanfadlli\r\n- fix(ios): keep the folder header below the landscape native bar @luqmanfadlli\r\n- feat(ios): apply Dolby Vision RPU reshaping in Picture in Picture @luqmanfadlli\r\n- fix(ios): extend toolbar fade to screen edges in landscape @luqmanfadlli\r\n- fix(ios): collapse collection header under the native bar @luqmanfadlli\r\n- fix(collection): keep folder cover visible under glass header @luqmanfadlli\r\n- feat(streams): static glass shows the streams artwork backdrop @luqmanfadlli\r\n- fix(ios): show the back button in iPad settings sub-pages (#381) @luqmanfadlli\r\n- fix(ios): keep the mpv drawable at native resolution (#383) @luqmanfadlli\r\n- fix(ios): convert Dolby Vision Profile 5 frames for Picture in Picture @luqmanfadlli\r\n- fix(ios): fix the hero trailer in the cinematic details background (#364) @luqmanfadlli\r\n- fix(hero): place the trailer mute button in the top-right corner (#353) @luqmanfadlli\r\n- fix(sync): push stream badge changes before the next pull (#367) @luqmanfadlli\r\n- fix(ios): keep HDR colours when drawing subtitles in Picture in Picture (#372) @luqmanfadlli\r\n- fix(player): pause seek preview prefetch while buffering and no early warm-up on iOS @luqmanfadlli\r\n- fix seekbar thumbnails taking a lot pf time to load (#380) @chrisk325\r\n- i18n: add French strings and align birth and death wording (#2664) @SK-Gits\r\n- i18n(vi): update latest Vietnamese strings (#2622) @blueocean2308\r\n- perf: smoother cold start and home on Android (#2652) @skoruppa\r\n- fix(home): show hero only after its source catalogs load (#2651) @skoruppa\r\n- feat(player): basic keyboard support (#2633) @skoruppa\r\n- fix(cw): dismiss a next up show by its content id, as on TV (#2632) @skoruppa\r\n- feat(cw): choose what selecting a Continue Watching item opens (#2630) @skoruppa\r\n- Translation improvements and adjustments for Slovak language (#2625) @mmsw91\r\n- i18n: add French strings for chapter title setting (#2621) @SK-Gits\r\n- feat(player): fall back to the next matching source on failure (#2612) @skoruppa\r\n- fix(player): show each start-up step on the loading screen, like NuvioTV (#2611) @skoruppa"
+        },
         {
           "version": "0.6.12-beta-Full",
           "date": "2026-11-13T01:28:27Z",
@@ -215,13 +222,6 @@
           "size": 66287229,
           "downloadURL": "https://github.com/luqmanfadlli/NuvioMobile-Enhanced/releases/download/0.4.21/Nuvio-v0.4.21-Enhanced.ipa",
           "localizedDescription": "- fix(home): match continue watching badge colors to tv @tapframe\r\n- perf(navigation): reduce root tab switch stalls @tapframe\r\n- Add TVDB anime ID preference to avoid per-season IMDB splits (#1952) @skoruppa\r\n- Revert \"perf(navigation): reduce tab switch animation stalls\" @tapframe\r\n- fix(player): keep android landscape lock during exit @tapframe\r\n- fix(profiles): add active profile toast and back button @tapframe\r\n- fix(profiles): prevent selecting the active profile @tapframe\r\n- fix(player): hide addons with no streams @tapframe\r\n- fix(player): start playback without waiting for addon subtitles (#1949) @halibiram\r\n- fix(trailer): open ios playback in fullscreen @tapframe\r\n- Fix anime skip mapping, subtitle language detection, watched badges and Polish translations (#1943) @skoruppa\r\n- fix(library): restore LaunchedEffect import after the 0.4.21 merge @luqmanfadlli\r\n- feat(streams): add pinned stream sources @luqmanfadlli"
-        },
-        {
-          "version": "0.4.20-Enhanced",
-          "date": "2026-09-14T09:40:55Z",
-          "size": 66202899,
-          "downloadURL": "https://github.com/luqmanfadlli/NuvioMobile-Enhanced/releases/download/0.4.20/Nuvio-v0.4.20-Enhanced.ipa",
-          "localizedDescription": "- feat(streams): add mobile background selection @tapframe\r\n- fix(player): center loading title and logo @tapframe\r\n- feat(player): dismiss next episode prompt with a right swipe @tapframe\r\n- fix(details): match toggle styles and remove duplicate season headings @tapframe\r\n- fix(library): sync title logo @tapframe\r\n- fix(details): use localized landscape backdrops @tapframe\r\n- feat(trailer): add fullscreen playback @tapframe\r\n- perf(navigation): reduce tab switch animation stalls @tapframe\r\n- Revert \"fix(streams): position sources panel below ios toolbar\" @luqmanfadlli\r\n- fix(navigation): let navbar pass through empty-area touches on iOS @luqmanfadlli\r\n- chore(home): drop unused BoxWithConstraints import from HomeScreen.kt @luqmanfadlli \r\n- fix(library): restore BoxWithConstraints import for the release calendar in LibraryScreen.kt @luqmanfadlli "
         }
       ]
     },
