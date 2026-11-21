@@ -1,0 +1,133 @@
+name: Yozora TrollStore IPA (no banned JIT entitlement)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/yozora-trollstore.yml'
+  schedule:
+    - cron: '41 10 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: yozora-trollstore-repack
+  cancel-in-progress: false
+
+jobs:
+  repack:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Identify latest official Yozora ARM64 release
+        id: upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import urllib.request
+
+          url = "https://api.github.com/repos/sqmrak/yozora/releases/latest"
+          headers = {
+              "Accept": "application/vnd.github+json",
+              "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+              "User-Agent": "yozora-trollstore-repacker",
+          }
+          with urllib.request.urlopen(urllib.request.Request(url, headers=headers)) as response:
+              release = json.load(response)
+          tag = release["tag_name"]
+          if not re.fullmatch(r"[A-Za-z0-9._-]+", tag):
+              raise SystemExit(f"Invalid upstream tag: {tag!r}")
+          assets = [a for a in release.get("assets", []) if a["name"].endswith("-arm64.ipa")]
+          if len(assets) != 1:
+              raise SystemExit(f"Expected exactly one ARM64 IPA, found {len(assets)}")
+          asset = assets[0]
+          digest = asset.get("digest", "")
+          if not digest.startswith("sha256:"):
+              raise SystemExit("Upstream release asset has no SHA-256 digest")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write(f"tag={tag}\n")
+              output.write(f"url={asset['browser_download_url']}\n")
+              output.write(f"sha256={digest.split(':', 1)[1]}\n")
+          print(f"Using {tag}, {asset['name']}")
+          PY
+
+      - name: Skip version already published
+        id: exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="yozora-${{ steps.upstream.outputs.tag }}-trollstore"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "already=true" >> "$GITHUB_OUTPUT"
+            echo "Already released: $tag"
+          else
+            echo "already=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download and verify official IPA; install static ldid
+        if: steps.exists.outputs.already != 'true'
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 --output Yozora-original.ipa "${{ steps.upstream.outputs.url }}"
+          echo "${{ steps.upstream.outputs.sha256 }}  Yozora-original.ipa" | sha256sum -c -
+          curl -fL --retry 3 --output ldid "https://github.com/ProcursusTeam/ldid/releases/download/v2.1.5-procursus8/ldid_linux_x86_64"
+          chmod +x ldid
+          ./ldid -h >/dev/null 2>&1 || true
+
+      - name: Re-sign without banned dynamic-codesigning
+        if: steps.exists.outputs.already != 'true'
+        run: |
+          set -euo pipefail
+          mkdir work
+          cd work
+          unzip -q ../Yozora-original.ipa
+          test -f Payload/Yozora.app/Yozora
+          ../ldid -e Payload/Yozora.app/Yozora > before.plist
+          python3 - <<'PY'
+          import plistlib
+          with open("before.plist", "rb") as stream:
+              previous = plistlib.load(stream)
+          if previous.get("dynamic-codesigning") is not True:
+              raise SystemExit("Expected dynamic-codesigning entitlement not present; stop and inspect upstream changes")
+          print("Verified original signature contains banned dynamic-codesigning")
+          PY
+          cat > clean-entitlements.plist <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>com.apple.developer.web-browser</key>
+              <true/>
+          </dict>
+          </plist>
+          EOF
+          ../ldid -Sclean-entitlements.plist Payload/Yozora.app/Yozora
+          ../ldid -e Payload/Yozora.app/Yozora > after.plist
+          python3 - <<'PY'
+          import plistlib
+          with open("after.plist", "rb") as stream:
+              entitlements = plistlib.load(stream)
+          assert "dynamic-codesigning" not in entitlements, entitlements
+          assert entitlements.get("com.apple.developer.web-browser") is True, entitlements
+          print("Verified the signed app no longer requests dynamic-codesigning")
+          PY
+          zip -qry "../Yozora-${{ steps.upstream.outputs.tag }}-arm64-TrollStore.ipa" Payload
+          cd ..
+          unzip -tq "Yozora-${{ steps.upstream.outputs.tag }}-arm64-TrollStore.ipa"
+
+      - name: Publish patched IPA in Releases
+        if: steps.exists.outputs.already != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create "yozora-${{ steps.upstream.outputs.tag }}-trollstore" \
+            "Yozora-${{ steps.upstream.outputs.tag }}-arm64-TrollStore.ipa" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Yozora ${{ steps.upstream.outputs.tag }} (TrollStore ARM64 fix)" \
+            --notes "Repack of the official sqmrak/yozora ARM64 release. The banned dynamic-codesigning entitlement was removed and the main binary was re-signed with ldid. Intended for iOS 15 A12+ devices using TrollStore. JIT is off by default in upstream Yozora. This fixes a known entitlement incompatibility, not every possible startup crash. Original upstream release: https://github.com/sqmrak/yozora/releases/tag/${{ steps.upstream.outputs.tag }}" 
