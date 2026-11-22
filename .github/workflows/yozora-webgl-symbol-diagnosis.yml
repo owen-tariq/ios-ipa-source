@@ -22,3 +22,7 @@ jobs:
           xcrun nm -an Payload/Yozora.app/Yozora | grep -E 'GetInternalformativ|GLEngine' | head -25 || true
           echo '== Clang / LLVM tools =='
           xcrun --find llvm-objdump
+          echo '== WebGL faulty robust function disassembly =='
+          xcrun llvm-objdump --macho --disassemble --start-address=0x102ab1bf8 --stop-address=0x102ab1d20 Payload/Yozora.app/Yozora | tail -110
+          echo '== YZSettings applyToCore disassembly =='
+          xcrun llvm-objdump --macho --disassemble --start-address=0x10004101c --stop-address=0x100041300 Payload/Yozora.app/Yozora | tail -220
