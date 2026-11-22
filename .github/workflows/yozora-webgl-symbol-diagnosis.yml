@@ -9,15 +9,16 @@ jobs:
   inspect:
     runs-on: macos-15
     steps:
-      - name: Inspect upstream executable symbols
+      - name: Inspect WebGL and options setter in upstream executable
         run: |
           set -euo pipefail
           curl -fL --retry 3 -o yozora.ipa https://github.com/sqmrak/yozora/releases/download/v1.1.0-stable/Yozora-v1.1.0-stable-arm64.ipa
           unzip -q yozora.ipa
-          xcrun nm -a Payload/Yozora.app/Yozora | grep -E '(_yozora_set_options|_yozora_core_set|_OBJC_CLASS_._YZSettings)' || true
-          echo "== global external symbols =="
-          xcrun nm -g Payload/Yozora.app/Yozora | grep -E '(_yozora_set_options|_OBJC_CLASS_._YZSettings)' || true
-          echo "== private / exported symbols =="
-          xcrun dyld_info -exports Payload/Yozora.app/Yozora 2>/dev/null | grep -E '(_yozora_set_options|_OBJC_CLASS_._YZSettings)' || true
-          echo "== symbol presence verification =="
-          xcrun nm -a Payload/Yozora.app/Yozora | grep -F '_yozora_set_options' || echo "No function in symbol table"
+          echo '== methods and functions =='
+          xcrun nm -an Payload/Yozora.app/Yozora | grep -E 'GL_GetInternalformativRobustANGLE|applyToCore|yozora_set_options|YZSettings' | head -70 || true
+          echo '== ObjC selector references =='
+          xcrun llvm-objdump --macho --objc-meta-data Payload/Yozora.app/Yozora 2>&1 | grep -A12 -B5 'applyToCore' | head -95 || true
+          echo '== GLEngine import and GLS shim symbols =='
+          xcrun nm -an Payload/Yozora.app/Yozora | grep -E 'GetInternalformativ|GLEngine' | head -25 || true
+          echo '== Clang / LLVM tools =='
+          xcrun --find llvm-objdump
