@@ -1,0 +1,30 @@
+name: Yozora precise arm64 disassembly
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [.github/workflows/yozora-arm64-disasm.yml]
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect compiled WebGL and settings instructions
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet capstone
+          curl -fL --retry 3 -o original.ipa https://github.com/sqmrak/yozora/releases/download/v1.1.0-stable/Yozora-v1.1.0-stable-arm64.ipa
+          unzip -qp original.ipa Payload/Yozora.app/Yozora > Yozora
+          python3 - <<'PY'
+          from capstone import Cs, CS_ARCH_ARM64, CS_MODE_ARM
+          b=open("Yozora","rb").read()
+          assert b[:4] == bytes.fromhex("cffaedfe"), b[:4].hex()
+          md=Cs(CS_ARCH_ARM64,CS_MODE_ARM)
+          for name,addr,count in [
+              ("GL_GetInternalformativRobustANGLE",0x102ab1bf8,220),
+              ("YZSettings.applyToCore",0x10004101c,640),
+          ]:
+              off=addr-0x100000000
+              print("\n======= "+name+" =======")
+              for ins in md.disasm(b[off:off+count],addr):
+                  print(f"{ins.address:#x} {ins.bytes.hex()} {ins.mnemonic:8} {ins.op_str}")
+          PY
