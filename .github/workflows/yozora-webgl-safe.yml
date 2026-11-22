@@ -1,0 +1,175 @@
+name: Build Yozora Paste + WebGL Safe IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/yozora-webgl-safe.yml'
+      - 'yozora-fixes/**'
+  schedule:
+    - cron: '28 11 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: yozora-webgl-safe
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup build Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Mach-O tooling
+        run: python3 -m pip install 'lief>=0.16,<0.19' 'capstone>=5,<6'
+
+      - name: Resolve upstream release
+        id: upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re, urllib.request
+          request = urllib.request.Request(
+              "https://api.github.com/repos/sqmrak/yozora/releases/latest",
+              headers={"Accept": "application/vnd.github+json",
+                       "Authorization": "Bearer " + os.environ["GH_TOKEN"],
+                       "User-Agent": "YozoraCompat-Builder"})
+          with urllib.request.urlopen(request) as response:
+              release = json.load(response)
+          tag = release["tag_name"]
+          assert re.fullmatch(r"[A-Za-z0-9._-]+", tag), tag
+          matches = [a for a in release["assets"] if a["name"].endswith("-arm64.ipa")]
+          if len(matches) != 1: raise SystemExit("Expected one upstream ARM64 release asset")
+          asset = matches[0]
+          assert re.fullmatch("sha256:[0-9a-f]{64}", asset.get("digest", "")), "Missing upstream SHA-256"
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write("tag=" + tag + "\n")
+              output.write("url=" + asset["browser_download_url"] + "\n")
+              output.write("sha256=" + asset["digest"].split(":")[1] + "\n")
+          PY
+
+      - name: Check release
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="yozora-${{ steps.upstream.outputs.tag }}-paste-webgl-safe"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download upstream IPA and signing tool
+        if: steps.existing.outputs.exists == 'false'
+        run: |
+          set -euo pipefail
+          curl -fLsS --retry 3 --output Yozora-original.ipa "${{ steps.upstream.outputs.url }}"
+          echo "${{ steps.upstream.outputs.sha256 }}  Yozora-original.ipa" | shasum -a 256 -c -
+          curl -fLsS --retry 3 -o ldid https://github.com/ProcursusTeam/ldid/releases/download/v2.1.5-procursus8/ldid_macosx_x86_64
+          chmod +x ldid
+          file ./ldid
+
+      - name: Build ARM64 compatibility library
+        if: steps.existing.outputs.exists == 'false'
+        run: |
+          set -euo pipefail
+          mkdir -p work/Payload
+          SDK="$(xcrun --sdk iphoneos --show-sdk-path)"
+          xcrun --sdk iphoneos clang \
+            -arch arm64 -miphoneos-version-min=15.0 -isysroot "$SDK" \
+            -fobjc-arc -dynamiclib \
+            -framework UIKit -framework Foundation \
+            -Wl,-install_name,@executable_path/Frameworks/libYozoraCompat.dylib \
+            -o libYozoraCompat.dylib \
+            yozora-fixes/YozoraCompat.m
+          file libYozoraCompat.dylib
+          ./ldid -S libYozoraCompat.dylib
+          test -s libYozoraCompat.dylib
+
+      - name: Inject patch into IPA; remove JIT entitlement; re-sign
+        if: steps.existing.outputs.exists == 'false'
+        run: |
+          set -euo pipefail
+          cd work
+          unzip -q ../Yozora-original.ipa
+          test -f Payload/Yozora.app/Yozora
+          # Safely disable the crashing upstream WebGL code path.
+          # Pinned to the exact audited instructions of the official v1.1.0 ARM64 IPA.
+          python3 ../yozora-fixes/disable_webgl_arm64.py Payload/Yozora.app/Yozora
+          mkdir -p Payload/Yozora.app/Frameworks
+          cp ../libYozoraCompat.dylib Payload/Yozora.app/Frameworks/
+          ../ldid -e Payload/Yozora.app/Yozora > original-entitlements.plist
+          python3 - <<'PY'
+          import plistlib
+          ent = plistlib.load(open("original-entitlements.plist", "rb"))
+          if ent.get("dynamic-codesigning") is not True:
+              raise SystemExit("Unexpected upstream entitlements - verify before packaging")
+          print("Upstream dynamic-codesigning identified")
+          PY
+          python3 - <<'PY'
+          from pathlib import Path
+          import lief
+          path = Path("Payload/Yozora.app/Yozora")
+          fat = lief.MachO.parse(str(path))
+          if fat is None or len(fat) != 1:
+              raise SystemExit("Expected one ARM64 Mach-O executable")
+          binary = fat.at(0)
+          dylib = "@executable_path/Frameworks/libYozoraCompat.dylib"
+          if binary.find_library(dylib):
+              raise SystemExit("Patch library already referenced")
+          command = binary.add_library(dylib)
+          if command is None: raise SystemExit("Cannot add load command")
+          binary.remove_signature()
+          patched = Path(str(path) + ".patched")
+          binary.write(str(patched))
+          patched.replace(path)
+          result = lief.MachO.parse(str(path))
+          if result is None or not result.at(0).find_library(dylib):
+              raise SystemExit("Library load command not persisted")
+          print("Verified native patch library load command")
+          PY
+          cat > clean-entitlements.plist <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>com.apple.developer.web-browser</key>
+            <true/>
+          </dict>
+          </plist>
+          EOF
+          ../ldid -Sclean-entitlements.plist Payload/Yozora.app/Yozora
+          ../ldid -e Payload/Yozora.app/Yozora > final-entitlements.plist
+          python3 - <<'PY'
+          import plistlib
+          ent = plistlib.load(open("final-entitlements.plist", "rb"))
+          assert not ent.get("dynamic-codesigning"), ent
+          assert ent.get("com.apple.developer.web-browser") is True
+          print("Validated stripped JIT entitlement")
+          PY
+          otool -L Payload/Yozora.app/Yozora | grep 'libYozoraCompat.dylib'
+          otool -L Payload/Yozora.app/Frameworks/libYozoraCompat.dylib
+          zip -qry "../Yozora-${{ steps.upstream.outputs.tag }}-arm64-Paste-WebGL-Safe.ipa" Payload
+          cd ..
+          unzip -tq "Yozora-${{ steps.upstream.outputs.tag }}-arm64-Paste-WebGL-Safe.ipa"
+
+      - name: Publish patched release
+        if: steps.existing.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "yozora-${{ steps.upstream.outputs.tag }}-paste-webgl-safe" \
+            "Yozora-${{ steps.upstream.outputs.tag }}-arm64-Paste-WebGL-Safe.ipa" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Yozora ${{ steps.upstream.outputs.tag }} - Paste + WebGL Safe (TrollStore)" \
+            --notes "Experimental ARM64 build for iOS 15+ / TrollStore, pinned to upstream v1.1.0-stable for the binary WebGL safety patch. Includes a verified targeted ARM64 fix for the repeated GLEngine SIGSEGV: disables WebGL only while preserving JavaScript, ordinary canvas rendering, and external-app links. The WebGL shim in the original app incorrectly forwards GL_GetInternalformativRobustANGLE to the native OpenGL ES driver without the required buffer-size argument; this may cause a null-pointer crash. WebGL sites may have reduced functionality, but graphics-driver crash path is avoided. Also includes the Paste keyboard toolbar and password-field Paste menu. At high memory use (650 MiB), requests Yozora cache cleanup. Strips the banned dynamic-codesigning entitlement before re-signing. May reduce memory-pressure crashes; other WebKit bugs can still crash. Original: https://github.com/sqmrak/yozora/releases/tag/${{ steps.upstream.outputs.tag }}. Keep the previous TrollStore-fixed IPA as a fallback. Report real crashes with Library/Caches/yozora-crash.log or iOS Analytics Data. No clipboard contents are logged or uploaded." 
