@@ -16,7 +16,7 @@ Replace these two ARM64 instructions with:
     str x8, [sp, #0x18]
 The first setting becomes 0 (WebGL disabled), the second stays 1.
 
-This binary workaround is limited to explicitly audited upstream releases.
+This binary workaround is limited to explicitly supported upstream releases, with strict method and byte validation.
 If the relevant method bytes or layout change, abort without output.
 """
 import re
@@ -32,7 +32,7 @@ if len(sys.argv) != 3:
 
 path = Path(sys.argv[1])
 tag = sys.argv[2]
-if tag not in {"v1.1.0-stable", "v1.2.0-stable"}:
+if tag not in {"v1.1.0-stable", "v1.2.0-stable", "v1.3.0-stable"}:
     raise SystemExit(f"Unknown upstream release {tag}, refusing binary patch")
 
 data = bytearray(path.read_bytes())
